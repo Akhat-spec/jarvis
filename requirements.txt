@@ -1,0 +1,14 @@
+anthropic>=1.0
+python-dotenv
+websockets>=15
+SpeechRecognition
+sounddevice
+numpy
+edge-tts
+mss
+pillow
+psutil
+comtypes
+google-api-python-client
+google-auth-oauthlib
+google-auth-httplib2

@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>J.A.R.V.I.S</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app" id="app">
+
+  <!-- ═══════════ шапка ═══════════ -->
+  <header class="top">
+    <div class="brand">
+      <span class="brand-dot fade" aria-hidden="true"></span>
+      <span class="brand-name">J.A.R.V.I.S.</span>
+    </div>
+    <nav class="tabs" id="tabs" aria-label="Разделы">
+      <button data-tab="home" class="on fade">Основное</button>
+      <button data-tab="apps" class="fade">Программы</button>
+      <button data-tab="games" class="fade">Игры</button>
+      <button data-tab="files" class="fade">Файлы</button>
+    </nav>
+    <div class="top-actions">
+      <button id="btnSleep" class="btn sleep">
+        <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v10"/><path d="M18.4 6.6a9 9 0 1 1-12.8 0"/></svg>
+        <span>Спящий режим</span>
+      </button>
+      <button id="btnSettings" class="btn">
+        <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></svg>
+        <span>Настройки</span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <!-- ═══════════ основное ═══════════ -->
+    <div class="home" id="home">
+      <aside class="side" aria-label="Система">
+        <h2 class="cap">СИСТЕМА</h2>
+        <div class="temps">
+          <div class="card temp" id="tCpu"><span class="lbl">ТЕМП. CPU</span><span class="temp-v">—</span><div class="bar"><b></b></div></div>
+          <div class="card temp" id="tGpu"><span class="lbl">ТЕМП. GPU</span><span class="temp-v">—</span><div class="bar"><b></b></div></div>
+        </div>
+        <div id="meters"></div>
+      </aside>
+
+      <div class="center">
+        <div class="orb" id="orb" role="img" aria-label="Состояние Джарвиса">
+          <!-- Каждое вращающееся кольцо — отдельный слой: его поворачивает видеокарта как готовую
+               картинку, без перерисовки сотен штрихов пунктира в каждом кадре. -->
+          <div class="dial" id="dial1"><svg viewBox="0 0 440 440" aria-hidden="true">
+            <circle class="fade dyn" cx="220" cy="220" r="214" fill="none" stroke-opacity="0.35" stroke-width="10" stroke-dasharray="1.5 5.2"/>
+            <circle cx="220" cy="220" r="206" fill="none" stroke="#F2B544" stroke-opacity="0.55" stroke-width="1"/>
+            <path d="M220 6 l-6 -10 h12 z M434 220 l10 -6 v12 z M220 434 l-6 10 h12 z M6 220 l-10 -6 v12 z" fill="#F2B544" fill-opacity="0.8"/>
+          </svg></div>
+          <div class="dial rev" id="dial2"><svg viewBox="0 0 440 440" aria-hidden="true">
+            <circle cx="220" cy="220" r="192" fill="none" stroke="#F2B544" stroke-width="2.5" stroke-dasharray="90 26 18 40 140 60" stroke-opacity="0.75"/>
+            <circle class="fade dyn" cx="220" cy="220" r="180" fill="none" stroke-width="7" stroke-dasharray="3 3" stroke-opacity="0.45"/>
+          </svg></div>
+          <div class="dial" id="dial3"><svg viewBox="0 0 440 440" aria-hidden="true">
+            <circle class="fade dyn" cx="220" cy="220" r="150" fill="none" stroke-opacity="0.5" stroke-width="1" stroke-dasharray="40 12 4 12"/>
+            <circle cx="220" cy="70" r="5" fill="#F2B544"/>
+            <circle class="fade dynfill" cx="370" cy="220" r="4"/>
+          </svg></div>
+          <svg viewBox="0 0 440 440" aria-hidden="true">
+            <circle class="fade dyn" cx="220" cy="220" r="166" fill="none" stroke-opacity="0.15" stroke-width="6"/>
+            <path class="fade dyn" d="M220 40 V110 M220 330 V400 M40 220 H110 M330 220 H400" stroke-opacity="0.25" stroke-width="1"/>
+          </svg>
+          <!-- кольцо уровня меняется часто — тоже свой слой, чтобы не перерисовывать остальные -->
+          <svg viewBox="0 0 440 440" aria-hidden="true" class="level-layer">
+            <circle class="fade dyn" id="levelRing" cx="220" cy="220" r="166" fill="none" stroke-width="6" stroke-linecap="round" pathLength="100" stroke-dasharray="6 100" transform="rotate(-90 220 220)"/>
+          </svg>
+          <canvas id="sphere" aria-hidden="true"></canvas>
+          <div class="badges">
+            <span id="captureBadge" class="badge amber hidden">◉ СНИМОК ЭКРАНА</span>
+            <span id="camBadge" class="badge red hidden">● КАМЕРА АКТИВНА</span>
+          </div>
+        </div>
+        <div class="levels" id="levels" aria-hidden="true"></div>
+        <div class="status" id="status" aria-live="polite">ОЖИДАНИЕ</div>
+        <div id="agentLine" class="agent-line hidden">АГЕНТ OPUS · <span id="agentNote"></span></div>
+        <div class="subs" aria-live="polite">
+          <div id="heard" class="sub user"></div>
+          <div id="saying" class="sub jarvis"></div>
+        </div>
+      </div>
+
+      <aside class="side" aria-label="Время и погода">
+        <div class="card clock-card">
+          <span class="clock"><span id="clock">--:--</span><small id="seconds">:--</small></span>
+          <span class="date" id="date">—</span>
+        </div>
+        <div class="card weather" id="weather">
+          <span class="lbl" id="wCity">ПОГОДА</span>
+          <div id="wBody"><span class="w-msg">Загружаю…</span></div>
+        </div>
+        <div class="card gcard" id="gCard">
+          <span class="lbl">GOOGLE · ПОЧТА И КАЛЕНДАРЬ</span>
+          <div id="gBody"><span class="w-msg">—</span></div>
+        </div>
+      </aside>
+    </div>
+
+    <!-- ═══════════ программы / игры / файлы ═══════════ -->
+    <section class="folder hidden" id="folder">
+      <div class="folder-head">
+        <h1 id="folderTitle">Программы</h1>
+        <span>Скажите «Джарвис, открой …» или нажмите</span>
+      </div>
+      <div class="tiles" id="tiles"></div>
+    </section>
+  </main>
+
+  <!-- ═══════════ низ ═══════════ -->
+  <div class="dock">
+    <button id="btnDialog" class="pill" aria-expanded="false" aria-controls="dialog">
+      <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <span id="dialogLabel">Диалог · 0 сообщений</span>
+      <span class="mono" id="dialogArrow">▾</span>
+    </button>
+    <div id="dialog" class="dialog hidden">
+      <div class="dialog-head">
+        <span class="lbl">ДИАЛОГ И ДЕЙСТВИЯ</span>
+        <button id="btnClear" class="link">очистить</button>
+      </div>
+      <div id="log" class="log" role="log" aria-live="polite">
+        <div class="empty" id="logEmpty">Скажите «Джарвис, …» или напишите команду.</div>
+      </div>
+    </div>
+
+    <form id="form" class="kbd hidden" autocomplete="off">
+      <label for="input" class="sr">Команда для Джарвиса</label>
+      <input id="input" placeholder="Напишите команду…">
+      <button type="submit" aria-label="Отправить">
+        <svg class="ic" viewBox="0 0 24 24" aria-hidden="true" style="stroke-width:2"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+      </button>
+    </form>
+
+    <div class="rounds">
+      <button id="btnMic" class="round on fade" aria-label="Микрофон" aria-pressed="true">
+        <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10v1a7 7 0 0 0 14 0v-1"/><path d="M12 18v4"/></svg>
+      </button>
+      <button id="btnKbd" class="round fade" aria-label="Клавиатура" aria-pressed="false">
+        <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/></svg>
+      </button>
+      <button id="btnCam" class="round fade" aria-label="Камера" aria-pressed="false">
+        <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+      </button>
+      <button id="btnStop" class="round stop" aria-label="Аварийная остановка (Esc, Ctrl+Alt+X)" title="Аварийная остановка — Esc, Ctrl+Alt+X">
+        <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="1.5"/></svg>
+      </button>
+    </div>
+    <div class="hints hidden" id="hints">Пробел (удерживать) — говорить без «Джарвис» · Esc — стоп · F11 — полный экран · Ctrl+Alt+X — стоп из любого окна</div>
+  </div>
+
+  <video id="camPreview" class="cam-preview" muted playsinline></video>
+
+  <!-- ═══════════ спящий режим ═══════════ -->
+  <div id="sleepOv" class="sleep-ov hidden">
+    <span class="sleep-clock" id="sleepClock">--:--</span>
+    <span class="date" id="sleepDate">—</span>
+    <p>Джарвис спит и откликается только на слово «Джарвис». Камера выключена.</p>
+    <button id="btnWake" class="wake-btn">
+      <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v10"/><path d="M18.4 6.6a9 9 0 1 1-12.8 0"/></svg>
+      Разбудить Джарвиса
+    </button>
+  </div>
+
+  <!-- ═══════════ настройки ═══════════ -->
+  <div id="drawer" class="drawer hidden">
+    <button class="drawer-close-area" id="drawerBg" aria-label="Закрыть настройки"></button>
+    <aside aria-label="Настройки">
+      <div class="drawer-head">
+        <h2>Настройки</h2>
+        <button id="btnCloseSettings" class="icon-btn" aria-label="Закрыть">
+          <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <section>
+        <h3 class="cap">МОЗГ</h3>
+        <div class="seg">
+          <button class="on fade">Claude API</button>
+          <button disabled title="Ollama не установлена на этом компьютере">Ollama (локально)</button>
+        </div>
+        <p class="hint">Модель: <span id="model" class="mono">—</span>. Ollama не установлена — локальный режим недоступен.</p>
+      </section>
+
+      <section>
+        <h3 class="cap">АВТОНОМНОСТЬ</h3>
+        <div class="seg" id="autonomy" role="radiogroup">
+          <button data-level="chat" role="radio">Разговор</button>
+          <button data-level="confirm" role="radio">С подтв.</button>
+          <button data-level="auto" role="radio">Авто</button>
+        </div>
+        <p class="hint" id="autonomyHint"></p>
+      </section>
+
+      <section>
+        <h3 class="cap">ПАРАМЕТРЫ</h3>
+        <div id="switches"></div>
+      </section>
+
+      <section>
+        <h3 class="cap">ПОГОДА</h3>
+        <form class="city-row" id="cityForm" autocomplete="off">
+          <label for="cityInput" class="sr">Город</label>
+          <input id="cityInput" class="field" placeholder="Город, например Казань">
+          <button class="btn-sm primary" type="submit">Сохранить</button>
+        </form>
+        <p class="hint">Данные Open-Meteo, обновление раз в 15 минут.</p>
+      </section>
+
+      <section>
+        <h3 class="cap">GOOGLE</h3>
+        <p class="hint" id="gStatus">—</p>
+        <div class="city-row">
+          <button class="btn-sm primary" id="btnGoogleConnect">Подключить Google</button>
+          <button class="btn-sm hidden" id="btnGoogleDisconnect">Отключить</button>
+        </div>
+        <p class="hint">Почта Gmail, Календарь и Карты. Джарвис читает письма и события только по вашей просьбе,
+          письмо отправляет только после вашего «да».</p>
+      </section>
+
+      <section>
+        <h3 class="cap">УСТРОЙСТВА</h3>
+        <div class="kv"><span>Микрофон</span><span id="micName">—</span></div>
+        <div class="kv"><span>Голос</span><span id="ttsInfo">—</span></div>
+      </section>
+
+      <section>
+        <h3 class="cap">ГОРЯЧИЕ КЛАВИШИ</h3>
+        <div class="kv"><span>Говорить без «Джарвис» (удерживать)</span><span>Пробел</span></div>
+        <div class="kv"><span>Аварийная остановка</span><span>Esc</span></div>
+        <div class="kv"><span>Стоп из любого окна</span><span>Ctrl+Alt+X</span></div>
+        <div class="kv"><span>Полный экран</span><span>F11</span></div>
+      </section>
+    </aside>
+  </div>
+
+  <div id="toasts" class="toasts" aria-live="assertive"></div>
+
+  <!-- ═══════════ подтверждение ═══════════ -->
+  <div id="confirm" class="confirm hidden" role="dialog" aria-modal="true" aria-labelledby="confirmText">
+    <div class="confirm-box">
+      <div class="confirm-head"><span id="confirmRisk" class="risk">ПОДТВЕРЖДЕНИЕ</span><span class="confirm-timer"><b id="confirmBar"></b></span></div>
+      <div id="confirmText" class="confirm-text"></div>
+      <div class="hint">Скажите «да» или «нет» — или нажмите кнопку</div>
+      <div class="confirm-actions">
+        <button id="confirmNo" class="btn-no">НЕТ <kbd>Esc</kbd></button>
+        <button id="confirmYes" class="btn-yes">ДА, ВЫПОЛНИТЬ <kbd>Enter</kbd></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

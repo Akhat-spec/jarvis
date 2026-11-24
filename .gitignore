@@ -1,0 +1,19 @@
+# личные данные — никогда не коммитить
+.env
+.ws_token
+google_token.json
+google_client_secret.json
+memory.json
+hud_settings.json
+wallpaper.json
+logs/
+.hud_profile/
+.wall_profile/
+hud/tile_img/
+tools/we_backup/
+tools/*.log
+# сборка и окружение
+.venv/
+dist/
+__pycache__/
+*.pyc

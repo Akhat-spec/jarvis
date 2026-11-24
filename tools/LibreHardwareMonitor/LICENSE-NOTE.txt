@@ -1,0 +1,3 @@
+LibreHardwareMonitor — сторонняя программа для чтения датчиков (температура процессора).
+Лицензия: Mozilla Public License 2.0 — https://www.mozilla.org/MPL/2.0/
+Исходный код и официальные сборки: https://github.com/LibreHardwareMonitor/LibreHardwareMonitor
